@@ -6,27 +6,33 @@ const PORT = 8080;
 app.set('view engine', 'ejs');
 
 
+const urlDatabase = {
+  'b2xVn2': 'http://www.lighthouselabs.ca',
+  '9sm5xK': 'http://www.google.ca'
+};
+
+app.get('/urls', (request, response) => {
+  const templateVars = { urls: urlDatabase };
+  response.render('urls_index', templateVars);
+});
 
 //******THE FOLLOWING IS FOR TESTING PURPOSES:
 
-// const urlDatabase = {
-//   'b2xVn2': 'http://www.lighthouselabs.ca',
-//   '9sm5xK': 'http://www.google.ca'
-// };
 
-// //landing page
-// app.get('/', (request, response) => {
-//   response.send('Hello!');
-// });
+
+//landing page
+app.get('/', (request, response) => {
+  response.send('Hello!');
+});
 
 // //Our urlDatabase object in JSON format
 // app.get('/urls.json', (request, response) => {
 //   response.json(urlDatabase);
 // });
 
-// app.get('/hello', (request, response) => {
-//   response.send('<html><body>Hello <b>World</b></body></html>\n');
-// });
+app.get('/hello', (request, response) => {
+  response.send('<html><body>Hello <b>World</b></body></html>\n');
+});
 
 // app.get('/set', (request, response) => {
 //   const a = 1;
