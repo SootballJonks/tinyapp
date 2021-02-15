@@ -7,9 +7,19 @@ const urlDatabase = {
   '9sm5xK': 'http://www.google.ca'
 };
 
+//landing page
 app.get('/', (request, response) => {
   response.send('Hello!');
 });
+
+//Our urlDatabase object in JSON format
+app.get("/urls.json", (request, response) => {
+  response.json(urlDatabase);
+});
+
+
+
+
 
 app.listen(PORT, () => {
   console.log(`Your test app is listening on port ${PORT} ...`);
