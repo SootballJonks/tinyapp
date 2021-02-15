@@ -2,14 +2,23 @@ const { request, response } = require('express');
 const express = require('express');
 const app = express();
 const PORT = 8080;
+const bodyParser = require("body-parser");
 
 app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({extended: true}));
 
-
+// **** These should be moved somewhere later... **** 
+//Default database
 const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.ca'
 };
+
+const generateRandomString = () => {
+  return Math.random().toString(16).substr(2, 6);
+}
+
+// ****
 
 
 //landing page
@@ -17,11 +26,13 @@ app.get('/', (request, response) => {
   response.send('Hello!');
 });
 
+//URL page - lists default database
 app.get('/urls', (request, response) => {
   const templateVars = { urls: urlDatabase };
   response.render('urls_index', templateVars);
 });
 
+//page for adding URLs to database
 app.get('/urls/new', (request, response) => {
   response.render('urls_new');
 });
@@ -32,6 +43,11 @@ app.get('/urls/:shortURL', (request, response) => {
   response.render('urls_show', templateVars);
 });
 
+//urls post request
+app.post('/urls', (request, response) => {
+  console.log(request.body);
+  response.send("Ok!");
+})
 
 
 //******THE FOLLOWING IS FOR TESTING PURPOSES:
