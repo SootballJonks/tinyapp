@@ -16,6 +16,8 @@ app.get('/urls', (request, response) => {
   response.render('urls_index', templateVars);
 });
 
+
+
 //******THE FOLLOWING IS FOR TESTING PURPOSES:
 
 
@@ -25,14 +27,16 @@ app.get('/', (request, response) => {
   response.send('Hello!');
 });
 
+//hello greeting page
+// app.get('/hello', (request, response) => {
+//   const templateVars = { greeting: 'Hello World!'};
+//   response.render('hello_world', templateVars);
+// });
+
 // //Our urlDatabase object in JSON format
 // app.get('/urls.json', (request, response) => {
 //   response.json(urlDatabase);
 // });
-
-app.get('/hello', (request, response) => {
-  response.send('<html><body>Hello <b>World</b></body></html>\n');
-});
 
 // app.get('/set', (request, response) => {
 //   const a = 1;
