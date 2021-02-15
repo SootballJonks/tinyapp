@@ -11,11 +11,22 @@ const urlDatabase = {
   '9sm5xK': 'http://www.google.ca'
 };
 
+
+//landing page
+app.get('/', (request, response) => {
+  response.send('Hello!');
+});
+
 app.get('/urls', (request, response) => {
   const templateVars = { urls: urlDatabase };
   response.render('urls_index', templateVars);
 });
 
+app.get('/urls/new', (request, response) => {
+  response.render('urls_new');
+});
+
+//urls route
 app.get('/urls/:shortURL', (request, response) => {
   const templateVars = { shortURL: request.params.shortURL, longURL: request.params.longURL };
   response.render('urls_show', templateVars);
@@ -24,13 +35,6 @@ app.get('/urls/:shortURL', (request, response) => {
 
 
 //******THE FOLLOWING IS FOR TESTING PURPOSES:
-
-
-
-//landing page
-app.get('/', (request, response) => {
-  response.send('Hello!');
-});
 
 //hello greeting page
 // app.get('/hello', (request, response) => {
