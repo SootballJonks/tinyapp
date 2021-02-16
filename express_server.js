@@ -14,7 +14,7 @@ const urlDatabase = {
   '9sm5xK': 'http://www.google.ca'
 };
 
-const generateRandomString = () => {
+function generateRandomString() {
   return Math.random().toString(16).substr(2, 6);
 }
 
@@ -37,17 +37,26 @@ app.get('/urls/new', (request, response) => {
   response.render('urls_new');
 });
 
+//urls post request
+app.post('/urls', (request, response) => {
+  let shortURL = generateRandomString();
+  urlDatabase[shortURL] = request.body.longURL;
+  console.log(request.body);
+  console.log(urlDatabase);
+  response.redirect(`/urls/:${shortURL}`);
+});
+
 //urls route
 app.get('/urls/:shortURL', (request, response) => {
-  const templateVars = { shortURL: request.params.shortURL, longURL: request.params.longURL };
+  const templateVars = { shortURL: request.params.shortURL, longURL: urlDatabase[request.params.shortURL] };
   response.render('urls_show', templateVars);
 });
 
-//urls post request
-app.post('/urls', (request, response) => {
-  console.log(request.body);
-  response.send("Ok!");
-})
+app.get('/u/:shortURL', (request, response) => {
+  const longUrl = urlDatabase[request.params.shortURL];
+  response.redirect(longUrl);
+});
+
 
 
 //******THE FOLLOWING IS FOR TESTING PURPOSES:
