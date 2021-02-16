@@ -43,7 +43,7 @@ app.post('/urls', (request, response) => {
   urlDatabase[shortURL] = request.body.longURL;
   console.log(request.body);
   console.log(urlDatabase);
-  response.redirect(`/urls/:${shortURL}`);
+  response.redirect(`/urls/${shortURL}`);
 });
 
 //urls route
