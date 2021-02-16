@@ -23,7 +23,7 @@ function generateRandomString() {
 
 //landing page
 app.get('/', (request, response) => {
-  response.send('Hello!');
+  response.redirect('/urls');
 });
 
 //URL page - lists default database
@@ -37,23 +37,13 @@ app.get('/urls/new', (request, response) => {
   response.render('urls_new');
 });
 
-//urls post request
+//**** POST REQUESTS:
+//add new URL to database
 app.post('/urls', (request, response) => {
   let shortURL = generateRandomString();
   urlDatabase[shortURL] = request.body.longURL;
   console.log(urlDatabase);
   response.redirect(`/urls/${shortURL}`);
-});
-
-//urls route
-app.get('/urls/:shortURL', (request, response) => {
-  const templateVars = { shortURL: request.params.shortURL, longURL: urlDatabase[request.params.shortURL] };
-  response.render('urls_show', templateVars);
-});
-
-app.get('/u/:shortURL', (request, response) => {
-  const longUrl = urlDatabase[request.params.shortURL];
-  response.redirect(longUrl);
 });
 
 //delete URLs from database
@@ -62,6 +52,28 @@ app.post('/urls/:shortURL/delete', (request, response) => {
   console.log(urlDatabase);
   response.redirect('/urls');
 });
+
+//edit URLs from the database
+app.post('/urls/:shortURL', (request, response) => {
+  const redirURL = request.params.shortURL;
+  response.redirect(`/urls/${redirURL}`);
+});
+
+//***** ROUTES
+
+//urls route
+app.get('/urls/:shortURL', (request, response) => {
+  const templateVars = { shortURL: request.params.shortURL, longURL: urlDatabase[request.params.shortURL] };
+  response.render('urls_show', templateVars);
+});
+
+//Shortened link route
+app.get('/u/:shortURL', (request, response) => {
+  const longUrl = urlDatabase[request.params.shortURL];
+  response.redirect(longUrl);
+});
+
+
 
 
 
