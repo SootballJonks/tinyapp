@@ -90,15 +90,20 @@ app.post('/register', (request, response) => {
   if (request.body.id === '' || request.body.email === '' || request.body.password === '') {
     response.status(400).send(`Missing information in the required fields!`);
   }
+
   const id = request.body.id;
   const email = request.body.email;
   const password = request.body.password;
 
-  userDatabase[id] = { id: id, email: email, password: password };
-  console.log(userDatabase);
-  const cookieUser = JSON.stringify(request.body);
-  response.cookie('user_id', cookieUser);
-  response.redirect('/urls')
+  if (userDatabase[id]) {
+    response.status(400).send(`Username already exists for us! Please try a different one!`);
+  } else {
+    userDatabase[id] = { id: id, email: email, password: password };
+    console.log(userDatabase);
+    const cookieUser = JSON.stringify(request.body);
+    response.cookie('user_id', cookieUser);
+    response.redirect('/urls')
+  };
 });
 
 //logging in with username
@@ -107,6 +112,9 @@ app.post('/login', (request, response) => {
   const password = request.body.password;
 
   console.log(userDatabase[id]);
+  if (!userDatabase[id]) {
+    response.status(400).send(`User does not exist!`);
+  }
   if (id === userDatabase[id].id && password === userDatabase[id].password) {
     response.cookie('user_id', JSON.stringify(userDatabase[id]));
     response.redirect('/urls');
