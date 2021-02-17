@@ -9,11 +9,20 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-// **** These should be moved somewhere later... **** 
-//Default database
+// **** These should probably be moved somewhere later... **** 
+//Default URL database
 const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.ca'
+};
+
+//Default user database
+const userDatabase = {
+  'Jonks': {
+    'id': 'Jonks',
+    'email': 'jonks@email.com',
+    'password': 'testing'
+  }
 };
 
 function generateRandomString() {
@@ -30,14 +39,26 @@ app.get('/', (request, response) => {
 
 //URL page - lists default database
 app.get('/urls', (request, response) => {
-  const templateVars = {  username: request.cookies.username, urls: urlDatabase };
+  const templateVars = {  user_id: request.cookies.user_id, urls: urlDatabase };
   response.render('urls_index', templateVars);
 });
 
 //page for adding URLs to database
 app.get('/urls/new', (request, response) => {
-  const templateVars = { username: request.cookies.username }
+  const templateVars = { user_id: request.cookies.user_id }
   response.render('urls_new', templateVars);
+});
+
+//registration page
+app.get('/register', (request, response) => {
+  const templateVars = { user_id: request.cookies.user_id }
+  response.render('register', templateVars);
+});
+
+//login page
+app.get('/login', (request, response) => {
+  const templateVars = { user_id: request.cookies.user_id }
+  response.render('login', templateVars);
 });
 
 //**** POST REQUESTS:
@@ -63,18 +84,43 @@ app.post('/urls/:shortURL', (request, response) => {
   response.redirect(`/urls/${redirURL}`);
 });
 
-//logging in with username
-app.post('/login', (request, response) => {
-  const credentials = request.body;
-  console.log(credentials);
-  response.cookie('username', credentials.username);
-  response.redirect('/urls');
+//register new account
+app.post('/register', (request, response) => {
+  console.log(request.body)
+  if (request.body.id === '' || request.body.email === '' || request.body.password === '') {
+    response.status(400).send(`Missing information in the required fields!`);
+  }
+  const id = request.body.id;
+  const email = request.body.email;
+  const password = request.body.password;
+
+  userDatabase[id] = { id: id, email: email, password: password };
+  console.log(userDatabase);
+  const cookieUser = JSON.stringify(request.body);
+  response.cookie('user_id', cookieUser);
+  response.redirect('/urls')
 });
 
+//logging in with username
+app.post('/login', (request, response) => {
+  const id = request.body.id;
+  const password = request.body.password;
+
+  console.log(userDatabase[id]);
+  if (id === userDatabase[id].id && password === userDatabase[id].password) {
+    response.cookie('user_id', JSON.stringify(userDatabase[id]));
+    response.redirect('/urls');
+  } else if (id === userDatabase[id].id) {
+    response.status(400).send(`Wrong password!`);
+  }
+
+});
+
+//Logout (delete cookie)
 app.post('/logout', (request, response) => {
-  response.clearCookie('username');
+  response.clearCookie('user_id');
   response.redirect('/urls');
-})
+});
 
 
 //***** ROUTES:
