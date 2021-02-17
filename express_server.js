@@ -69,7 +69,13 @@ app.post('/login', (request, response) => {
   console.log(credentials);
   response.cookie('username', credentials.username);
   response.redirect('/urls');
+});
+
+app.post('/logout', (request, response) => {
+  response.clearCookie('username');
+  response.redirect('/urls');
 })
+
 
 //***** ROUTES:
 
