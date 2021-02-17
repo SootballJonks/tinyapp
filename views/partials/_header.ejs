@@ -10,15 +10,18 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-      <% if (username) { %>
-        <form class="form-inline my-2 my-lg-0" method="POST" action="/logout">
-          <h3>Hello, <%= username %>! </h3>
-          <button type="submit" name="username" class="btn btn-dark my-2 my-sm-0">Log Out</button>
+      <% if (user_id) { %>
+        <form class="form-inline" method="POST" action="/logout">
+          <h3>Hello, <%= JSON.parse(user_id).id %>! </h3>
+          <button type="submit" name="user_id" class="btn btn-dark">Log Out</button>
         </form>
       <% } else { %>
-        <form class="form-inline my-2 my-lg-0" method="POST" action="/login">
-          <input class="form-control mr-sm-2" type="text" name="username" placeholder="Username">
-          <button type="submit" class="btn btn-dark my-2 my-sm-0">Log In</button>
+        <form class="form-inline" method="GET" action="/login">
+        <!--  <input class="form-control mr-sm-2" type="text" name="username" placeholder="Username"> -->
+          <button type="submit" class="btn btn-dark" style="margin-right: 5px; margin-left: 10px;">Log In</button>
+        </form>
+        <form class="form-inline" method="GET" action="/register">
+          <button type="submit" class="btn btn-dark" style="margin-right: 10px; margin-left: 5px;">Register</button>
         </form>
       <% } %>
   </nav>

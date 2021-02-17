@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+  <title>Register - Smol-Link Example</title>
+</head>
+
+<body>
+  <header>
+    <%- include('partials/_header') %>
+  </header>
+
+  <div class="container-fluid register-form">
+    <div class="form">
+      <div class="note" style="text-align: center; height: 80px; background: -webkit-linear-gradient(left, #168604, #2cb388); color: #fff; font-weight: bold; line-height: 80px;">
+        <p>Register for a new account on Smol-Links!</p>
+      </div>
+      
+      <form class="form-group"action="/login" method="POST">
+        <div class="form-content" style="padding: 5%; border: 1px solid #abacad; margin-bottom: 2%;">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <input type="email" class="form-control" name="email" placeholder="Email"/>
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" name="password" placeholder="Password"/>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success">Log In</button>
+        </div>
+      </form>
+  </div>
+</body>
+</html>
