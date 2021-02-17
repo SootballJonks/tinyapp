@@ -1,6 +1,6 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
-    <a class="navbar-brand" href="/urls">Smol-Links</a>
+    <a class="navbar-brand" href="/urls" style="font-size:  x-large;">Smol-Links</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -10,5 +10,16 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
+      <% if (username) { %>
+        <form class="form-inline my-2 my-lg-0" method="POST" action="/logout">
+          <h3>Hello, <%= username %>! </h3>
+          <button type="submit" class="btn btn-dark my-2 my-sm-0">Log Out</button>
+        </form>
+      <% } else { %>
+        <form class="form-inline my-2 my-lg-0" method="POST" action="/login">
+          <input class="form-control mr-sm-2" type="text" name="username" placeholder="Username">
+          <button type="submit" class="btn btn-dark my-2 my-sm-0">Log In</button>
+        </form>
+      <% } %>
   </nav>
 </header>

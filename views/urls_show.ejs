@@ -18,11 +18,13 @@
       </div>
     <div class="card-footer text-muted">
       <h4 class="card-title">Change this Smol-Link</h4>
-      <form class="form-inline" action="/urls/<%= shortURL %>" method="POST">
-        <label for="longURL">Edit:</label>
-        <input class="form-control" type="text" name="longURL" placeholder="<%= longURL %>" style="width: 300px; margin: 1em">
-        <button type="submit" class="btn btn-success">Submit</button>
-      </form>
+      <div class="container mx-auto">
+        <form class="form-group" action="/urls/<%= shortURL %>" method="POST">
+          <label for="longURL">Edit:</label>
+          <input class="form-group" type="text" name="longURL" placeholder="<%= longURL %>" style="width: 300px; margin: 1em">
+          <button type="submit" class="btn btn-success">Change</button>
+        </form>
+      </div>
     </div>
   </div>
   <!-- Bootstrap JS -->

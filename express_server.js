@@ -3,9 +3,11 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 // **** These should be moved somewhere later... **** 
 //Default database
@@ -28,13 +30,14 @@ app.get('/', (request, response) => {
 
 //URL page - lists default database
 app.get('/urls', (request, response) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {  username: request.cookies.username, urls: urlDatabase };
   response.render('urls_index', templateVars);
 });
 
 //page for adding URLs to database
 app.get('/urls/new', (request, response) => {
-  response.render('urls_new');
+  const templateVars = { username: request.cookies.username }
+  response.render('urls_new', templateVars);
 });
 
 //**** POST REQUESTS:
@@ -56,14 +59,23 @@ app.post('/urls/:shortURL/delete', (request, response) => {
 //edit URLs from the database
 app.post('/urls/:shortURL', (request, response) => {
   const redirURL = request.params.shortURL;
+  urlDatabase[redirURL] = request.body.longURL;
   response.redirect(`/urls/${redirURL}`);
 });
 
-//***** ROUTES
+//logging in with username
+app.post('/login', (request, response) => {
+  const credentials = request.body;
+  console.log(credentials);
+  response.cookie('username', credentials.username);
+  response.redirect('/urls');
+})
+
+//***** ROUTES:
 
 //urls route
 app.get('/urls/:shortURL', (request, response) => {
-  const templateVars = { shortURL: request.params.shortURL, longURL: urlDatabase[request.params.shortURL] };
+  const templateVars = { username: request.cookies.username, shortURL: request.params.shortURL, longURL: urlDatabase[request.params.shortURL] };
   response.render('urls_show', templateVars);
 });
 
