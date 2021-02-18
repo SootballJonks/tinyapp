@@ -10,7 +10,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
-  keys: ['key1', 'key2']
+  keys: ['Hackerman', 'is', 'the', 'most', 'powerful', 'hacker', 'of', 'all', 'time']
 }));
 
 
@@ -107,6 +107,9 @@ app.post('/register', (request, response) => {
   if (request.body.id === '' || request.body.email === '' || request.body.password === '') {
     response.status(400).send(`Missing information in the required fields!`);
   }
+  // if (request.body.password !== request.body.password2) {
+  //   response.status(400).send(`Your passwords don't match! Please try again.`);
+  // }
 
   const id = request.body.id;
   const email = request.body.email;
@@ -166,14 +169,14 @@ app.get('/urls/:shortURL', (request, response) => {
   const urls = urlPairs(user.id);
   const shortURL = request.params.shortURL;
 
-  if (request.sesion.user_id) {
+  if (request.session.user_id) {
     const owner = urlOwner(user.id);
     console.log(owner[shortURL]);
     if (user.id === owner[shortURL]) {
       const templateVars = {  user_id: request.session.user_id, shortURL: shortURL, longURL: urls[shortURL] };
       response.render('urls_show', templateVars);
     } else {
-      response.status(404).send(`Uh oh! That Smol-Link does not exist!`);
+      response.status(404).redirect('/404');
     }
   } else {
     response.redirect('/urls');
