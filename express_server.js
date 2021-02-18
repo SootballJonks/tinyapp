@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 const { urlDatabase, userDatabase, generateRandomString, checkEmail, urlPairs, urlOwner } = require('./helpers');
 
 app.set('view engine', 'ejs');
@@ -30,8 +31,8 @@ app.get('/urls', (request, response) => {
 
 //page for adding URLs to database
 app.get('/urls/new', (request, response) => {
-  const templateVars = { user_id: request.cookies.user_id }
-  if (request.cookies.user_id){
+  const templateVars = { user_id: request.cookies.user_id };
+  if (request.cookies.user_id) {
     response.render('urls_new', templateVars);
   } else {
     response.redirect('/login');
@@ -40,14 +41,20 @@ app.get('/urls/new', (request, response) => {
 
 //registration page
 app.get('/register', (request, response) => {
-  const templateVars = { user_id: request.cookies.user_id }
+  const templateVars = { user_id: request.cookies.user_id };
   response.render('register', templateVars);
 });
 
 //login page
 app.get('/login', (request, response) => {
-  const templateVars = { user_id: request.cookies.user_id }
+  const templateVars = { user_id: request.cookies.user_id };
   response.render('login', templateVars);
+});
+
+//404 custom page
+app.get('/404', (request, response) => {
+  const templateVars = { user_id: request.cookies.user_id };
+  response.render('404', templateVars);
 });
 
 //******************* POST REQUESTS: **********************
@@ -69,16 +76,16 @@ app.post('/urls/:shortURL/delete', (request, response) => {
 
   if (request.cookies.user_id) {
     const owner = urlOwner(user.id);
-    console.log(owner[shortURL])
+    console.log(owner[shortURL]);
     if (user.id === owner[shortURL]) {
       delete urlDatabase[request.params.shortURL];
       console.log(urlDatabase);
       response.redirect('/urls');
     } else {
       response.status(404).send(`Uh oh! That Smol-Link does not exist!`);
-    };
+    }
   } else {
-    response.redirect('/urls')
+    response.redirect('/urls');
   }
 });
 
@@ -92,7 +99,7 @@ app.post('/urls/:shortURL', (request, response) => {
 
 //register new account
 app.post('/register', (request, response) => {
-  console.log(request.body)
+  console.log(request.body);
   if (request.body.id === '' || request.body.email === '' || request.body.password === '') {
     response.status(400).send(`Missing information in the required fields!`);
   }
@@ -100,35 +107,37 @@ app.post('/register', (request, response) => {
   const id = request.body.id;
   const email = request.body.email;
   const password = request.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const eCheck = checkEmail(email);
 
-  if (userDatabase[id] || eCheck ) {
+  if (userDatabase[id] || eCheck) {
     response.status(400).send(`The username or email that you've provided already exists for us! Please try a different one!`);
   } else {
-    userDatabase[id] = { id: id, email: email, password: password };
+    userDatabase[id] = { id: id, email: email, password: hashedPassword };
     console.log(userDatabase);
     const cookieUser = JSON.stringify(request.body);
     response.cookie('user_id', cookieUser);
-    response.redirect('/urls')
-  };
+    response.redirect('/urls');
+  }
 });
 
 //logging in with email
 app.post('/login', (request, response) => {
   const email = request.body.email;
   const password = request.body.password;
+
   const user = checkEmail(email);
   
   if (user) {
-    if (email === userDatabase[user].email && password === userDatabase[user].password) {
+    if (email === userDatabase[user].email && bcrypt.compareSync(password, userDatabase[user].password)) {
       response.cookie('user_id', JSON.stringify(userDatabase[user]));
       response.redirect('/urls');
     } else if (email === userDatabase[user].email) {
       response.status(400).send(`Wrong password!`);
-    } 
+    }
   } else {
     response.status(403).send(`User does not exist!`);
-  };
+  }
 });
 
 //Logout (delete cookie)
@@ -148,15 +157,15 @@ app.get('/urls/:shortURL', (request, response) => {
 
   if (request.cookies.user_id) {
     const owner = urlOwner(user.id);
-    console.log(owner[shortURL])
+    console.log(owner[shortURL]);
     if (user.id === owner[shortURL]) {
       const templateVars = {  user_id: request.cookies.user_id, shortURL: shortURL, longURL: urls[shortURL] };
       response.render('urls_show', templateVars);
     } else {
       response.status(404).send(`Uh oh! That Smol-Link does not exist!`);
-    };
+    }
   } else {
-    response.redirect('/urls')
+    response.redirect('/urls');
   }
 
 });

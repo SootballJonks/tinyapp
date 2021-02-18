@@ -38,9 +38,9 @@ const checkEmail = (email) => {
 const urlPairs = (owner) => {
   let urlPair = {};
   for (let [key, value] of Object.entries(urlDatabase)) {
-   if (owner === value.owner) {
-     urlPair[key] = value.longURL;
-   }
+    if (owner === value.owner) {
+      urlPair[key] = value.longURL;
+    }
   }
   return urlPair;
 };
@@ -53,9 +53,9 @@ const urlOwner = (owner) => {
       urlOwner[key] = value.owner;
     }
   }
-  console.log("loop owners:", urlOwner)
+  console.log("loop owners:", urlOwner);
   return urlOwner;
-}
+};
 
 
 
@@ -67,4 +67,4 @@ module.exports = {
   checkEmail,
   urlPairs,
   urlOwner,
-}
+};
