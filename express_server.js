@@ -71,7 +71,8 @@ app.post('/urls/:shortURL/delete', (request, response) => {
 //edit URLs from the database
 app.post('/urls/:shortURL', (request, response) => {
   const redirURL = request.params.shortURL;
-  urlDatabase[redirURL] = request.body[shortURL][longURL];
+  const user = JSON.parse(request.cookies.user_id);
+  urlDatabase[redirURL] = { longURL: request.body.longURL, owner: user.id };
   response.redirect(`/urls/${redirURL}`);
 });
 
@@ -127,7 +128,11 @@ app.post('/logout', (request, response) => {
 //urls route
 app.get('/urls/:shortURL', (request, response) => {
   const user = JSON.parse(request.cookies.user_id);
-  const templateVars = {  user_id: request.cookies.user_id, urls: urlDatabase };
+  const urls = urlPairs(user.id);
+  const shortURL = request.params.shortURL;
+
+  
+  const templateVars = {  user_id: request.cookies.user_id, shortURL: shortURL, longURL: urls[shortURL] };
   response.render('urls_show', templateVars);
 });
 

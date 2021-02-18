@@ -42,6 +42,7 @@ const urlPairs = (owner) => {
      urlPair[key] = value.longURL;
    }
   }
+  console.log(urlPair)
   return urlPair;
 }
 
