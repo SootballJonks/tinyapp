@@ -100,9 +100,10 @@ app.post('/register', (request, response) => {
   const id = request.body.id;
   const email = request.body.email;
   const password = request.body.password;
+  const eCheck = checkEmail(email);
 
-  if (userDatabase[id]) {
-    response.status(400).send(`Username already exists for us! Please try a different one!`);
+  if (userDatabase[id] || eCheck ) {
+    response.status(400).send(`The username or email that you've provided already exists for us! Please try a different one!`);
   } else {
     userDatabase[id] = { id: id, email: email, password: password };
     console.log(userDatabase);
