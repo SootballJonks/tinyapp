@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
-const { urlDatabase, userDatabase, generateRandomString, checkEmail } = require('./helpers');
+const { urlDatabase, userDatabase, generateRandomString, checkEmail, urlPairs } = require('./helpers');
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -19,14 +19,23 @@ app.get('/', (request, response) => {
 
 //URL page - lists default database
 app.get('/urls', (request, response) => {
-  const templateVars = {  user_id: request.cookies.user_id, urls: urlDatabase };
-  response.render('urls_index', templateVars);
+  if (request.cookies.user_id) {
+    const user = JSON.parse(request.cookies.user_id);
+    const templateVars = {  user_id: request.cookies.user_id, urls: urlPairs(user.id) };
+    response.render('urls_index', templateVars);
+  } else {
+    response.redirect('/login');
+  }
 });
 
 //page for adding URLs to database
 app.get('/urls/new', (request, response) => {
   const templateVars = { user_id: request.cookies.user_id }
-  response.render('urls_new', templateVars);
+  if (request.cookies.user_id){
+    response.render('urls_new', templateVars);
+  } else {
+    response.redirect('/login');
+  }
 });
 
 //registration page
@@ -42,10 +51,12 @@ app.get('/login', (request, response) => {
 });
 
 //******************* POST REQUESTS: **********************
+
 //add new URL to database
 app.post('/urls', (request, response) => {
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = request.body.longURL;
+  const user = JSON.parse(request.cookies.user_id);
+  urlDatabase[shortURL] = { longURL: request.body.longURL, owner: user.id };
   console.log(urlDatabase);
   response.redirect(`/urls/${shortURL}`);
 });
@@ -60,7 +71,7 @@ app.post('/urls/:shortURL/delete', (request, response) => {
 //edit URLs from the database
 app.post('/urls/:shortURL', (request, response) => {
   const redirURL = request.params.shortURL;
-  urlDatabase[redirURL] = request.body.longURL;
+  urlDatabase[redirURL] = request.body[shortURL][longURL];
   response.redirect(`/urls/${redirURL}`);
 });
 
@@ -115,13 +126,14 @@ app.post('/logout', (request, response) => {
 
 //urls route
 app.get('/urls/:shortURL', (request, response) => {
-  const templateVars = { username: request.cookies.username, shortURL: request.params.shortURL, longURL: urlDatabase[request.params.shortURL] };
+  const user = JSON.parse(request.cookies.user_id);
+  const templateVars = {  user_id: request.cookies.user_id, urls: urlDatabase };
   response.render('urls_show', templateVars);
 });
 
 //Shortened link route
 app.get('/u/:shortURL', (request, response) => {
-  const longUrl = urlDatabase[request.params.shortURL];
+  const longUrl = urlDatabase[request.params.shortURL].longURL;
   response.redirect(longUrl);
 });
 

@@ -1,7 +1,7 @@
 //Default URL database
 const urlDatabase = {
-  'b2xVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.ca'
+  'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', owner: "Jonks" },
+  '9sm5xK': { longURL: 'http://www.google.ca', owner: "Jonks" }
 };
 
 //Default user database
@@ -24,6 +24,7 @@ const generateRandomString = () => {
   return Math.random().toString(16).substr(2, 6);
 };
 
+//check Email to see if it exists within the database
 const checkEmail = (email) => {
   for (let user in userDatabase) {
     if (email === userDatabase[user].email) {
@@ -33,6 +34,17 @@ const checkEmail = (email) => {
   return false;
 };
 
+//loop through urlDatabase to display longURLs
+const urlPairs = (owner) => {
+  let urlPair = {};
+  for (let [key, value] of Object.entries(urlDatabase)) {
+   if (owner === value.owner) {
+     urlPair[key] = value.longURL;
+   }
+  }
+  return urlPair;
+}
+
 
 
 
@@ -41,5 +53,5 @@ module.exports = {
   userDatabase,
   generateRandomString,
   checkEmail,
-
+  urlPairs,
 }
