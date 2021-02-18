@@ -63,9 +63,23 @@ app.post('/urls', (request, response) => {
 
 //delete URLs from database
 app.post('/urls/:shortURL/delete', (request, response) => {
-  delete urlDatabase[request.params.shortURL];
-  console.log(urlDatabase);
-  response.redirect('/urls');
+
+  const user = JSON.parse(request.cookies.user_id);
+  const shortURL = request.params.shortURL;
+
+  if (request.cookies.user_id) {
+    const owner = urlOwner(user.id);
+    console.log(owner[shortURL])
+    if (user.id === owner[shortURL]) {
+      delete urlDatabase[request.params.shortURL];
+      console.log(urlDatabase);
+      response.redirect('/urls');
+    } else {
+      response.status(404).send(`Uh oh! That Smol-Link does not exist!`);
+    };
+  } else {
+    response.redirect('/urls')
+  }
 });
 
 //edit URLs from the database
