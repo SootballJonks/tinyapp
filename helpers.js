@@ -42,8 +42,19 @@ const urlPairs = (owner) => {
      urlPair[key] = value.longURL;
    }
   }
-  console.log(urlPair)
   return urlPair;
+};
+
+//loop through urlDatabase to get owner of links!
+const urlOwner = (owner) => {
+  let urlOwner = {};
+  for (let [key, value] of Object.entries(urlDatabase)) {
+    if (owner === value.owner) {
+      urlOwner[key] = value.owner;
+    }
+  }
+  console.log("loop owners:", urlOwner)
+  return urlOwner;
 }
 
 
@@ -55,4 +66,5 @@ module.exports = {
   generateRandomString,
   checkEmail,
   urlPairs,
+  urlOwner,
 }

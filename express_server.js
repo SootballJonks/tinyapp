@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
-const { urlDatabase, userDatabase, generateRandomString, checkEmail, urlPairs } = require('./helpers');
+const { urlDatabase, userDatabase, generateRandomString, checkEmail, urlPairs, urlOwner } = require('./helpers');
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -131,9 +131,19 @@ app.get('/urls/:shortURL', (request, response) => {
   const urls = urlPairs(user.id);
   const shortURL = request.params.shortURL;
 
-  
-  const templateVars = {  user_id: request.cookies.user_id, shortURL: shortURL, longURL: urls[shortURL] };
-  response.render('urls_show', templateVars);
+  if (request.cookies.user_id) {
+    const owner = urlOwner(user.id);
+    console.log(owner[shortURL])
+    if (user.id === owner[shortURL]) {
+      const templateVars = {  user_id: request.cookies.user_id, shortURL: shortURL, longURL: urls[shortURL] };
+      response.render('urls_show', templateVars);
+    } else {
+      response.status(404).send(`Uh oh! That Smol-Link does not exist!`);
+    };
+  } else {
+    response.redirect('/urls')
+  }
+
 });
 
 //Shortened link route
