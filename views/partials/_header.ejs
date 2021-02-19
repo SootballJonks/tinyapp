@@ -11,8 +11,8 @@
       </div>
     </div>
       <% if (user_id) { %>
+        <h4 style="color: #fff; padding-right: 10px;">Hello, <%= JSON.parse(user_id).email %>! </h4>
         <form class="form-inline" method="POST" action="/logout">
-          <h3>Hello, <%= JSON.parse(user_id).email %>! </h3>
           <button type="submit" name="user_id" class="btn btn-dark">Log Out</button>
         </form>
       <% } else { %>

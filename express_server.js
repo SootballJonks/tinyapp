@@ -24,23 +24,21 @@ app.get('/', (request, response) => {
 
 //URL page - lists default database
 app.get('/urls', (request, response) => {
-  if (request.session.user_id) {
-    const user = JSON.parse(request.session.user_id);
-    const templateVars = {  user_id: request.session.user_id, urls: urlPairs(user.id) };
-    response.render('urls_index', templateVars);
-  } else {
+  if (!request.session.user_id) {
     response.redirect('/login');
   }
+  const user = JSON.parse(request.session.user_id);
+  const templateVars = {  user_id: request.session.user_id, urls: urlPairs(user.id) };
+  response.render('urls_index', templateVars);
 });
 
 //page for adding URLs to database
 app.get('/urls/new', (request, response) => {
   const templateVars = { user_id: request.session.user_id };
-  if (request.session.user_id) {
-    response.render('urls_new', templateVars);
-  } else {
+  if (!request.session.user_id) {
     response.redirect('/login');
   }
+  response.render('urls_new', templateVars);
 });
 
 //registration page
@@ -68,7 +66,6 @@ app.post('/urls', (request, response) => {
   let shortURL = generateRandomString();
   const user = JSON.parse(request.session.user_id);
   urlDatabase[shortURL] = { longURL: request.body.longURL, owner: user.id };
-  console.log(urlDatabase);
   response.redirect(`/urls/${shortURL}`);
 });
 
@@ -78,19 +75,15 @@ app.post('/urls/:shortURL/delete', (request, response) => {
   const user = JSON.parse(request.session.user_id);
   const shortURL = request.params.shortURL;
 
-  if (request.session.user_id) {
-    const owner = urlOwner(user.id);
-    console.log(owner[shortURL]);
-    if (user.id === owner[shortURL]) {
-      delete urlDatabase[request.params.shortURL];
-      console.log(urlDatabase);
-      response.redirect('/urls');
-    } else {
-      response.status(404).send(`Uh oh! That Smol-Link does not exist!`);
-    }
-  } else {
+  if (!request.session.user_id) {
     response.redirect('/urls');
   }
+  const owner = urlOwner(user.id);
+  if (user.id !== owner[shortURL]) {
+    response.status(404).redirect(`/404`);
+  }
+  delete urlDatabase[request.params.shortURL];
+  response.redirect('/urls');
 });
 
 //edit URLs from the database
@@ -103,13 +96,9 @@ app.post('/urls/:shortURL', (request, response) => {
 
 //register new account
 app.post('/register', (request, response) => {
-  console.log(request.body);
   if (request.body.id === '' || request.body.email === '' || request.body.password === '') {
     response.status(400).send(`Missing information in the required fields!`);
   }
-  // if (request.body.password !== request.body.password2) {
-  //   response.status(400).send(`Your passwords don't match! Please try again.`);
-  // }
 
   const id = request.body.id;
   const email = request.body.email;
@@ -124,7 +113,6 @@ app.post('/register', (request, response) => {
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(password, salt, (err, hash) => {
         userDatabase[id] = { id: id, email: email, password: hash };
-        console.log(userDatabase);
         const cookieUser = JSON.stringify(request.body);
         request.session.user_id = cookieUser;
         response.redirect('/urls');
@@ -139,19 +127,17 @@ app.post('/login', (request, response) => {
   const password = request.body.password;
   const user = checkEmail(email);
   
-  if (user) {
-    bcrypt.compare(password, userDatabase[user].password, (err, result) => {
-      if (email === userDatabase[user].email && result) {
-        request.session.user_id = JSON.stringify(userDatabase[user]);
-        response.redirect('/urls');
-      } else if (email === userDatabase[user].email) {
-        response.status(400).send(`Wrong password!`);
-      }
-    });
-
-  } else {
+  if (!user) {
     response.status(403).send(`User does not exist!`);
   }
+  bcrypt.compare(password, userDatabase[user].password, (err, result) => {
+    if (email === userDatabase[user].email && result) {
+      request.session.user_id = JSON.stringify(userDatabase[user]);
+      response.redirect('/urls');
+    } else if (email === userDatabase[user].email) {
+      response.status(400).send(`Wrong password!`);
+    }
+  });
 });
 
 //Logout (delete cookie)
@@ -169,19 +155,15 @@ app.get('/urls/:shortURL', (request, response) => {
   const urls = urlPairs(user.id);
   const shortURL = request.params.shortURL;
 
-  if (request.session.user_id) {
-    const owner = urlOwner(user.id);
-    console.log(owner[shortURL]);
-    if (user.id === owner[shortURL]) {
-      const templateVars = {  user_id: request.session.user_id, shortURL: shortURL, longURL: urls[shortURL] };
-      response.render('urls_show', templateVars);
-    } else {
-      response.status(404).redirect('/404');
-    }
-  } else {
+  if (!request.session.user_id) {
     response.redirect('/urls');
   }
-
+  const owner = urlOwner(user.id);
+  if (user.id !== owner[shortURL]) {
+    response.status(404).redirect('/404');
+  }
+  const templateVars = {  user_id: request.session.user_id, shortURL: shortURL, longURL: urls[shortURL] };
+  response.render('urls_show', templateVars);
 });
 
 //Shortened link route
