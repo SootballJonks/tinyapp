@@ -96,17 +96,14 @@ app.post('/urls/:shortURL', (request, response) => {
 
 //register new account
 app.post('/register', (request, response) => {
-  if (request.body.id === '' || request.body.email === '' || request.body.password === '') {
-    response.status(400).send(`Missing information in the required fields!`);
-  }
-
   const id = request.body.id;
   const email = request.body.email;
   const password = request.body.password;
   const eCheck = checkEmail(email);
 
-
-  if (userDatabase[id] || eCheck) {
+  if (request.body.id === '' || request.body.email === '' || request.body.password === '') {
+    response.status(400).send(`Missing information in the required fields!`);
+  } else if (userDatabase[id] || eCheck) {
     response.status(400).send(`The username or email that you've provided already exists for us! Please try a different one!`);
   } else {
 
